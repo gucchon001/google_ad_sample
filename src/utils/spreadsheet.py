@@ -9,8 +9,7 @@ import os
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
 from googleapiclient.discovery import build
-from google.oauth2 import service_account
-from google.oauth2.credentials import Credentials
+from google.oauth2.service_account import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
@@ -101,7 +100,7 @@ class SpreadsheetUtils:
                     raise FileNotFoundError(f"サービスアカウントファイルが見つかりません: {service_account_file}")
                 
                 print(f"サービスアカウント認証を使用します: {service_account_file}")
-                credentials = service_account.Credentials.from_service_account_file(
+                credentials = Credentials.from_service_account_file(
                     service_account_file, scopes=cls.SCOPES
                 )
                 
@@ -395,4 +394,29 @@ class SpreadsheetUtils:
             return None
         except Exception as e:
             print(f"シートIDの取得に失敗しました: {str(e)}")
-            raise 
+            raise
+    
+    @staticmethod
+    def write_dataframe_to_sheet(spreadsheet_id: str, range_name: str, dataframe: pd.DataFrame):
+        """
+        Pandas DataFrameをスプレッドシートに書き込む
+        """
+        # Google Sheets APIの認証情報を設定
+        SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+        creds = Credentials.from_service_account_file('config/boxwood-dynamo-384411-6dec80faabfc.json', scopes=SCOPES)
+        
+        # Google Sheets APIサービスを構築
+        service = build('sheets', 'v4', credentials=creds)
+        
+        # DataFrameをリストに変換
+        values = [dataframe.columns.tolist()] + dataframe.values.tolist()
+        
+        # スプレッドシートにデータを書き込む
+        body = {
+            'values': values
+        }
+        result = service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id, range=range_name,
+            valueInputOption='RAW', body=body).execute()
+        
+        print(f"{result.get('updatedCells')} cells updated.") 

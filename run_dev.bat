@@ -1,6 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 chcp 65001 >nul
+rem ※ バッチファイルのディレクトリに移動することで、相対パスの解決を統一します。
+cd /d %~dp0
 
 rem Initialize environment variables
 set "VENV_PATH=.\venv"
@@ -10,6 +12,9 @@ set "DEFAULT_SCRIPT=src.main"
 set "APP_ENV="
 set "SCRIPT_TO_RUN="
 set "TEST_MODE="
+
+rem プロジェクトルートをPYTHONPATHに追加
+set "PYTHONPATH=%CD%"
 
 rem Parse command line arguments
 :parse_args
@@ -117,7 +122,7 @@ if not "%CURRENT_HASH%"=="%STORED_HASH%" (
     echo %CURRENT_HASH%>.req_hash
 )
 
-rem Run the script
+rem Run the script in module mode
 echo [LOG] 環境: %APP_ENV%
 echo [LOG] 実行スクリプト: %SCRIPT_TO_RUN%
 %PYTHON_CMD% -m %SCRIPT_TO_RUN% %TEST_MODE%

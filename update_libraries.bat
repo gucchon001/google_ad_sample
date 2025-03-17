@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 
 echo ===== Python Library Update Tool =====
