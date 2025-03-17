@@ -1,72 +1,72 @@
 @echo off
 setlocal
 
-echo ===== Python ライブラリアップデートツール =====
+echo ===== Python Library Update Tool =====
 echo.
 
-:: Python が利用可能か確認
+:: Check if Python is available
 python --version > nul 2>&1
 if errorlevel 1 (
-    echo エラー: Python が見つかりません。
-    echo Python がインストールされていることを確認してください。
+    echo Error: Python not found.
+    echo Please ensure Python is installed.
     goto END
 )
 
-:: 仮想環境の存在確認
+:: Check for virtual environment
 if not exist "venv" (
-    echo 仮想環境が見つかりません。新しく作成します...
+    echo Virtual environment not found. Creating a new one...
     python -m venv venv
     if errorlevel 1 (
-        echo 仮想環境の作成に失敗しました。
+        echo Failed to create virtual environment.
         goto END
     )
-    echo 仮想環境を作成しました。
+    echo Virtual environment created successfully.
 )
 
-:: 仮想環境をアクティベート
+:: Activate virtual environment
 call venv\Scripts\activate.bat
 if errorlevel 1 (
-    echo 仮想環境のアクティベートに失敗しました。
+    echo Failed to activate virtual environment.
     goto END
 )
 
-echo 仮想環境をアクティベートしました。
+echo Virtual environment activated successfully.
 
-:: pip のアップグレード
-echo pip をアップグレードしています...
+:: Upgrade pip
+echo Upgrading pip...
 python -m pip install --upgrade pip
 if errorlevel 1 (
-    echo pip のアップグレードに失敗しました。
+    echo Failed to upgrade pip.
     goto DEACTIVATE
 )
 
-:: requirements.txt の存在確認
+:: Check for requirements.txt
 if not exist "requirements.txt" (
-    echo requirements.txt が見つかりません。
+    echo requirements.txt not found.
     goto DEACTIVATE
 )
 
-:: ライブラリのアップデート
+:: Update libraries
 echo.
-echo ライブラリをアップデートしています...
+echo Updating libraries...
 pip install -r requirements.txt --upgrade
 if errorlevel 1 (
-    echo ライブラリのアップデートに失敗しました。
+    echo Failed to update libraries.
     goto DEACTIVATE
 )
 
 echo.
-echo 現在インストールされているパッケージ一覧:
+echo Current installed package list:
 pip list
 echo.
-echo ライブラリのアップデートが完了しました。
+echo Libraries updated successfully.
 
 :DEACTIVATE
-:: 仮想環境を非アクティベート
+:: Deactivate virtual environment
 call venv\Scripts\deactivate.bat
 
 :END
 echo.
-echo 処理を終了します。
+echo Processing completed.
 pause
 endlocal 
