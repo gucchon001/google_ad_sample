@@ -333,3 +333,12 @@ class MetricsConfigUtils:
         else:
             print("警告: 'limit' の設定が見つかりません。デフォルト値を使用します。")
             return 100  # デフォルト値 
+
+def calculate_average_cpc(cost_micros, clicks):
+    try:
+        if clicks > 0:
+            return cost_micros / clicks
+        else:
+            return 0  # クリック数がゼロの場合は0を返す
+    except ZeroDivisionError:
+        return 0  # 例外が発生した場合も0を返す 
